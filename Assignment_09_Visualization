@@ -1,0 +1,86 @@
+# Assignment #9 — Visualization in R: base, lattice, ggplot2
+# Dataset: OrangeCounty (AER)
+# Andrew Burson
+
+# ---- Setup ----
+# install.packages(c("AER","lattice","ggplot2"))  # keep commented per class rules
+library(AER)
+library(lattice)
+library(ggplot2)
+
+# ---- Load the dataset ----
+data("OrangeCounty")
+df <- as.data.frame(OrangeCounty)
+df$t <- seq_len(nrow(df))
+head(df)
+
+
+# ===== Base Graphics =====
+
+
+png("base_employment_vs_gnp.png", width = 1200, height = 900, res = 150)
+plot(df$gnp, df$employment,
+     main = "Base: Employment vs GNP in Orange County (1965–1983)",
+     xlab = "Real GNP",
+     ylab = "Employment",
+     pch = 19)
+abline(lm(employment ~ gnp, data = df), lwd = 2)
+grid()
+dev.off()
+
+png("base_hist_employment.png", width = 1200, height = 900, res = 150)
+hist(df$employment,
+     main = "Base: Distribution of Employment",
+     xlab = "Employment",
+     breaks = 12)
+grid()
+dev.off()
+
+
+# ===== Lattice Plots =====
+
+
+# Create 4 time periods for conditioning
+df$period <- cut(df$t,
+                 breaks = quantile(df$t, probs = seq(0,1,by=0.25)),
+                 include.lowest = TRUE,
+                 labels = c("1965–69","1970–74","1975–79","1980–83"))
+
+png("lattice_employment_vs_gnp_by_period.png", width = 1400, height = 1000, res = 150)
+print(
+  xyplot(employment ~ gnp | period,
+         data = df,
+         main = "Lattice: Employment vs GNP by Time Period",
+         xlab = "Real GNP",
+         ylab = "Employment",
+         pch = 16,
+         panel = function(x, y, ...) {
+           panel.xyplot(x, y, ...)
+           panel.lmline(x, y, col = "black", lwd = 2)
+         })
+)
+dev.off()
+
+
+# ========= ggplot2 =======
+
+
+p1 <- ggplot(df, aes(x = gnp, y = employment, color = period)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "ggplot2: Employment vs GNP (colored by period)",
+       x = "Real GNP",
+       y = "Employment") +
+  theme_minimal()
+
+ggsave("ggplot_employment_vs_gnp_by_period.png", p1, width = 8, height = 6, dpi = 150)
+
+p2 <- ggplot(df, aes(employment)) +
+  geom_histogram(binwidth = 20, boundary = 0, closed = "left", fill = "steelblue") +
+  facet_wrap(~ period) +
+  labs(title = "ggplot2: Employment Distribution by Period",
+       x = "Employment",
+       y = "Count") +
+  theme_minimal()
+
+ggsave("ggplot_hist_employment_by_period.png", p2, width = 8.5, height = 6.5, dpi = 150)
