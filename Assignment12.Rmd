@@ -1,0 +1,42 @@
+---
+title: "My R Markdown Primer"
+author: "Andrew Burson"
+date: "2025-11-14"
+output: html_document
+---
+
+# Introduction
+
+R Markdown is a simple way to combine text, R code, and math in one file. It lets me explain what I’m doing, show my code, and display the results all together. This makes it easier to keep my work organized and reproducible.
+
+# Narrative Section
+
+In this assignment, I learned how Markdown formatting works, like using headings, bold text, lists, and inline code. I also learned how R code chunks run inside the document. This makes it easier to write a report while also showing the code that produced my results.
+
+Here is an example of **inline math**: $a + b = c$.
+
+And here is a displayed equation:
+
+$$
+y = mx + b
+$$
+
+# R Code Examples
+
+Below is my first code chunk, which loads a dataset and shows the first few rows.
+
+```{r setup}
+library(ggplot2)
+```
+
+```{r}
+# Load data
+data(mtcars)
+head(mtcars)
+```
+
+```{r}
+ggplot(mtcars, aes(x = mpg, y = hp)) +
+  geom_point() +
+  labs(title = "MPG vs Horsepower")
+```
